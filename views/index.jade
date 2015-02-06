@@ -1,0 +1,13 @@
+extends layout
+
+block content
+  h1= title
+  p Welcome to #{title}
+
+  h2 Your playlists
+  ul
+    each playlist in playlists
+      li
+        if playlist.images[0]
+          img(src=playlist.images[0].url width="60" height="60")
+        | #{playlist.name}
