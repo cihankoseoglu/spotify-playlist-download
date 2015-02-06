@@ -1,6 +1,6 @@
 # Spotify playlist downloader
-![dependencies](https://david-dm.org/renarsvilnis/spotify-playlist-download.svg)
-
+![Npm dependencies](https://david-dm.org/renarsvilnis/spotify-playlist-download.svg)
+![Travis-ci build](https://travis-ci.org/renarsvilnis/spotify-playlist-download.svg)
 Application for downloading spotify playlists from multiple torrent files.
 
 ## Idea
@@ -10,9 +10,11 @@ Created with the main reason to see whether i can code it or not while trying ou
 
 ## TO-DO
 - [ ] Setup GULP
-- [ ] Write unit tests using [CHAI](https://github.com/chaijs/chai) + [MOCHA](https://github.com/mochajs/mocha)
-- [ ] Add Travis-ci support
-- [ ] Use Angular.js or React.js
+- [ ] Setup testing && write unit tests using [CHAI](https://github.com/chaijs/chai) + [MOCHA](https://github.com/mochajs/mocha)
+- [x] Add Travis-ci support
+- [ ] Try out Angular.js or React.js
+- [ ] Try out Browserify.js
+- [ ] Try out [6to5](https://github.com/6to5/6to5)?
 - [x] Spotify api - login
 - [x] Spotify api - get user playlists
 - [ ] Spotify api - get songs of a playlist
@@ -26,7 +28,6 @@ Created with the main reason to see whether i can code it or not while trying ou
 - [ ] Ability to paste playlist url
 - [ ] Option to choose audio quality - compressed, raw, etc..
 - [ ] Community driven right song choosing?
-- [ ] Try out [6to5](https://github.com/6to5/6to5)?
 
 ## Author
 Created by [Renārs Vilnis](https://twitter.com/RenarsVilnis)
