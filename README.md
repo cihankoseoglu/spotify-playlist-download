@@ -17,7 +17,7 @@ Created with the main reason to see whether i can code it or not while trying ou
 - [ ] Try out [6to5](https://github.com/6to5/6to5)?
 - [x] Spotify api - login
 - [x] Spotify api - get user playlists
-- [ ] Spotify api - get songs of a playlist
+- [x] Spotify api - get songs of a playlist
 - [ ] Add abilty to search for album
 - [ ] Add abilty to find a song inside of torrent
 - [ ] Add abilty to download invidvidual song from torrent

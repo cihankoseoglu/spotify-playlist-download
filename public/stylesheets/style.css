@@ -6,3 +6,17 @@ body {
 a {
   color: #00B7FF;
 }
+
+#playlists {
+}
+
+#playlists li,
+#playlists p {
+  font-size: 10px;
+  line-height: 1;
+}
+
+#playlists p {
+  margin: 0;
+  padding: 0;
+}

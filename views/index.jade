@@ -5,9 +5,18 @@ block content
   p Welcome to #{title}
 
   h2 Your playlists
-  ul
+  ul#playlists
     each playlist in playlists
       li
-        if playlist.images[0]
-          img(src=playlist.images[0].url width="60" height="60")
-        | #{playlist.name}
+        p
+          if playlist.images[0]
+            img(src=playlist.images[0].url width="60" height="60")
+          | #{playlist.name}
+        ul
+          each song in playlist.songs
+            li
+              p Song - #{song.track.name}
+              p Artists - 
+                each artist in song.track.artists
+                  | #{artist.name} & 
+              p Album - #{song.track.album.name}

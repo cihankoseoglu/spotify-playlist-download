@@ -38,17 +38,21 @@ router.get('/', function(req, res, next) {
 
     // set songs for each playlist
     function getAllPlaylistSongs(callback) {
+
+      // TEMPORARY
+      playlists = playlists.splice(0, 1);
+
       async.each(playlists, function getPlaylistSongs(playlist, callback2) {
 
         console.log('Fething songs for', playlist.id);
 
         // TO-DO if user has more songs then allowed in single request
-        spotify.api.getPlaylistTracks(userdata.id, playlist.id)
+        spotify.api.getPlaylistTracks(playlist.owner.id, playlist.id)
           .then(function(data) {
-            // console.log(data);
-            playlist.songs = data;
+            playlist.songs = data.items;
             callback2();
           }, function(err) {
+            playlist.songs = [];
             callback2(err);
           });
       }, function(err) {
@@ -62,7 +66,11 @@ router.get('/', function(req, res, next) {
     // if(err)
     //   return next(err);
 
-    console.log('done');
+    console.log(playlists[0].songs[0].track);
+    console.log(playlists[0].songs[0].track.artists);
+
+    req.session.userdata = userdata;
+    req.session.playlists = playlists;
 
     res.render('index', {
       title: 'Hello',
