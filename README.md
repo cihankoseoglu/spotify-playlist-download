@@ -14,7 +14,7 @@ Created with the main reason to see whether i can code it or not while trying ou
 - [ ] Setup GULP
 - [ ] Setup testing && write unit tests using [CHAI](https://github.com/chaijs/chai) + [MOCHA](https://github.com/mochajs/mocha)
 - [x] Add Travis-ci support
-- [ ] Try out Angular.js or React.js
+- [ ] Try out Angular.js or React.js or Meteor.js
 - [ ] Try out Browserify.js
 - [ ] Try out [6to5](https://github.com/6to5/6to5)?
 - [x] Spotify api - login
