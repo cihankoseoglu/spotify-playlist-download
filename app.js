@@ -14,7 +14,7 @@ var spotify         = require('./lib/spotify.js');
 
 // -----
 // config's
-var appConfig       = require('./config/app.js');
+var config          = require('./config/app.js');
 
 // ----------
 var app = express();
@@ -46,8 +46,8 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use(function(req, res, next) {
     // redirect to login
-    if(!req.session.accessToken && !/^\/login.*/.test(req.url))
-        return res.redirect('/login');
+    // if(!req.session.accessToken && !/^\/login.*/.test(req.url))
+    //     return res.redirect('/login');
 
     next();
 });
@@ -55,6 +55,7 @@ app.use(function(req, res, next) {
 app.use('/', require('./routes/index'));
 app.use('/login', require('./routes/login'));
 app.use('/users', require('./routes/users'));
+app.use('/search', require('./routes/search'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
@@ -88,7 +89,7 @@ app.use(function(err, req, res, next) {
 });
 
 
-app.listen(appConfig.server.port);
-
+app.listen(config.server.port);
+console.log('Server running at', config.server.host + ':' + config.server.port);
 
 module.exports = app;

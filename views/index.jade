@@ -5,7 +5,7 @@ block content
   p Welcome to #{title}
 
   h2 Your playlists
-  ul
+  ul#playlists
     each playlist in playlists
       li
         p
@@ -14,5 +14,9 @@ block content
           | #{playlist.name}
         ul
           each song in playlist.songs
-            li= song.track.name
-
+            li
+              p Song - #{song.track.name}
+              p Artists - 
+                each artist in song.track.artists
+                  | #{artist.name} & 
+              p Album - #{song.track.album.name}

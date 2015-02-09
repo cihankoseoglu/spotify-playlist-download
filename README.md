@@ -20,7 +20,7 @@ Created with the main reason to see whether i can code it or not while trying ou
 - [x] Spotify api - login
 - [x] Spotify api - get user playlists
 - [x] Spotify api - get songs of a playlist
-- [ ] Spotify api - get album,artist info of a song
+- [x] Spotify api - get album,artist info of a song
 - [ ] Add abilty to search for album
 - [ ] Add abilty to find a song inside of torrent
 - [ ] Add abilty to download invidvidual song from torrent

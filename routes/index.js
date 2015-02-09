@@ -38,6 +38,10 @@ router.get('/', function(req, res, next) {
 
     // set songs for each playlist
     function getAllPlaylistSongs(callback) {
+
+      // TEMPORARY
+      playlists = playlists.splice(0, 1);
+
       async.each(playlists, function getPlaylistSongs(playlist, callback2) {
 
         console.log('fetching data');
@@ -49,12 +53,10 @@ router.get('/', function(req, res, next) {
             playlist.songs = data.items;
             callback2();
           }, function(err) {
-            // callback2(err);
-            console.log(playlist.name, err);
-            callback2();
+            playlist.songs = [];
+            callback2(err);
           });
       }, function(err) {
-        // callback(err);
         callback();
       });
     }
@@ -63,8 +65,11 @@ router.get('/', function(req, res, next) {
     // if(err)
     //   return next(err);
 
-
     console.log(playlists[0].songs[0].track);
+    console.log(playlists[0].songs[0].track.artists);
+
+    req.session.userdata = userdata;
+    req.session.playlists = playlists;
 
     res.render('index', {
       title: 'Hello',
