@@ -11,12 +11,15 @@ We all love using Spotify, but there are cases where we need our music on device
 Created with the main reason to see whether i can code it or not while trying out and learning new frameworks, tools.
 
 ## TO-DO
-- [ ] Setup GULP
+- [x] Setup GULP
 - [ ] Setup testing && write unit tests using [CHAI](https://github.com/chaijs/chai) + [MOCHA](https://github.com/mochajs/mocha)
 - [x] Add Travis-ci support
-- [ ] Try out Angular.js or React.js or Meteor.js
-- [ ] Try out Browserify.js
-- [ ] Try out [6to5](https://github.com/6to5/6to5)?
+- [x] Try out React.js
+~~- [ ] Try out Browserify.js~~
+- [x] Convert from an web-application to an desktop-application using [nw.js](https://github.com/nwjs/nw.js/)
+- [ ] Make file for app compilation?
+~~- [ ] Try out [6to5](https://github.com/6to5/6to5)?~~
+- [ ] Information caching
 - [x] Spotify api - login
 - [x] Spotify api - get user playlists
 - [x] Spotify api - get songs of a playlist
@@ -25,8 +28,6 @@ Created with the main reason to see whether i can code it or not while trying ou
 - [ ] Add abilty to find a song inside of torrent
 - [ ] Add abilty to download invidvidual song from torrent
 - [ ] Multiple torrent tracker support
-- [ ] Convert from an web-application to an desktop-application using [nw.js](https://github.com/nwjs/nw.js/)
-- [ ] Information caching
 - [ ] Listening to playlist changes
 - [ ] Ability to paste playlist url
 - [ ] Option to choose audio quality - compressed, raw, etc..
