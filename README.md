@@ -15,10 +15,10 @@ Created with the main reason to see whether i can code it or not while trying ou
 - [ ] Setup testing && write unit tests using [CHAI](https://github.com/chaijs/chai) + [MOCHA](https://github.com/mochajs/mocha)
 - [x] Add Travis-ci support
 - [x] Try out React.js
-~~- [ ] Try out Browserify.js~~
+- ~~[ ] Try out Browserify.js~~
 - [x] Convert from an web-application to an desktop-application using [nw.js](https://github.com/nwjs/nw.js/)
 - [ ] Make file for app compilation?
-~~- [ ] Try out [6to5](https://github.com/6to5/6to5)?~~
+- ~~[ ] Try out [6to5](https://github.com/6to5/6to5)?~~
 - [ ] Information caching
 - [x] Spotify api - login
 - [x] Spotify api - get user playlists
