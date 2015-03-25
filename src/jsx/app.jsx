@@ -1,5 +1,7 @@
 'use strict';
 
+var url = require('url');
+
 var spotify = require('../lib/spotify.js');
 
 var App = React.createClass({
@@ -7,6 +9,7 @@ var App = React.createClass({
     return (
       <div id="app">
         <AppLogin />
+        <div id="modals"></div>
       </div>
     );
   }
@@ -16,19 +19,39 @@ var App = React.createClass({
 // ########################################
 // Login
 // ########################################
+
+var AppLoginModal = React.createClass({
+
+  render: function() {
+
+    document.getElementById('modals').classList.add('show');
+
+    return (
+      <iframe src={this.props.url} className="modal modal-login"></iframe>
+    );
+  }
+});
+
 var AppLogin = React.createClass({
 
   onClickHandler: function() {
     console.log('Logging in');
-    spotify.createAuthorizeURL()
 
-    var win = gui.Window.open(spotify.createAuthorizeURL(), {
-      toolbar: false,
-      frame: false,
-      position: 'center',
-      width: 960,
-      height: 620
-    });
+    var uri = spotify.createAuthorizeURL();
+
+    console.log(url.parse(uri, true));
+
+    // gui.Shell.openExternal(uri);
+
+    // React.render(<AppLoginModal url={spotify.createAuthorizeURL()} />, document.getElementById('modals'));
+
+    // var win = gui.Window.open(spotify.createAuthorizeURL(), {
+    //   toolbar: false,
+    //   frame: false,
+    //   position: 'center',
+    //   width: 960,
+    //   height: 620
+    // });
   },
 
   render: function() {
