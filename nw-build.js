@@ -1,7 +1,6 @@
 // https://github.com/mllrsohn/node-webkit-builder
 var NwBuilder = require('node-webkit-builder');
 
-
 // Filter production modules
 // ! Important to seperate dev and prod modules in package.json !
 var pkg = require('./package.json');
@@ -11,26 +10,21 @@ prodDepenencies.map(function(el, i) {
   prodDepenencies[i] = './node_modules/' + el + '/**/**';
 });
 
-
-var buildFiles = [
+buildFiles = [
   './package.json',
   './lib/**/**',
   './dist/**/**',
   './config/**/**',
   './views/**/**',
   './bower_components/**/**',
-];
-
-buildFiles = buildFiles.concat(prodDepenencies);
+].concat(prodDepenencies);
 
 var nw = new NwBuilder({
-  // files: './**/**',
   files: buildFiles,
   platforms: [/*'osx32',*/ 'osx64', /*'win32', 'win64'*/]
 });
 
 //Log stuff you want
-
 nw.on('log', console.log);
 
 // Build returns a promise

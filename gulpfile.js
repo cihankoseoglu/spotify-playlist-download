@@ -1,21 +1,29 @@
-var gulp = require('gulp');
-var sass = require('gulp-ruby-sass');
-var autoprefixer = require('gulp-autoprefixer');
-var minifycss = require('gulp-minify-css');
-var jshint = require('gulp-jshint');
-// var uglify = require('gulp-uglify');
-var imagemin = require('gulp-imagemin');
-// var rename = require('gulp-rename');
-// var concat = require('gulp-concat');
-var notify = require('gulp-notify');
-var cache = require('gulp-cache');
-var livereload = require('gulp-livereload');
-var browserify = require('gulp-browserify');
-var react = require('gulp-react');
-var del = require('del');
-var plumber = require('gulp-plumber');
+var gulp     = require('gulp'),
+    sass         = require('gulp-ruby-sass'),
+    autoprefixer = require('gulp-autoprefixer'),
+    minifycss    = require('gulp-minify-css'),
+    jshint       = require('gulp-jshint'),
+    uglify       = require('gulp-uglify'),
+    imagemin     = require('gulp-imagemin'),
+    // rename    = require('gulp-rename'),
+    // concat    = require('gulp-concat'),
+    notify       = require('gulp-notify'),
+    cache        = require('gulp-cache'),
+    livereload   = require('gulp-livereload'),
+    browserify   = require('gulp-browserify'),
+    react        = require('gulp-react'),
+    del          = require('del'),
+    plumber      = require('gulp-plumber'),
+    gulpif       = require('gulp-if'),
+    gStreamify   = require('gulp-streamify');
+
+var env = process.env.NODE_ENV || 'development';
 
 // http://markgoodyear.com/2014/01/getting-started-with-gulp/
+
+var isProduction = function() {
+  return env == 'production';
+};
 
 var IN_BASE = 'src';
 var OUT_BASE = 'dist';
@@ -41,11 +49,9 @@ var OUT = {
 gulp.task('browserify_scripts', function() {
   return gulp.src('lib/main.js')
     .pipe(plumber())
-    .pipe(browserify({
-      // insertGlobals: true
-    }))
-    .pipe(livereload())
+    .pipe(gStreamify(browserify()))
     .pipe(plumber.stop())
+    .pipe(gulpif(isProduction(), uglify()))
     .pipe(gulp.dest(OUT.SCRIPTS));
 });
 
@@ -55,8 +61,7 @@ gulp.task('styles', function() {
     .pipe(plumber())
     .pipe(sass({
       compass: true,
-      style: 'expanded',
-      // sourcemap: null,
+      style: isProduction ? 'compressed' : 'expanded',
       trace: true,
     }))
     .pipe(autoprefixer({
@@ -79,25 +84,28 @@ gulp.task('scripts', function() {
      // .pipe(concat('main.js'))
     // .pipe(gulp.dest('dist/assets/js'))
     // .pipe(rename({suffix: '.min'}))
-    // .pipe(uglify())
+
+    .pipe(gulpif(isProduction(), uglify()))
     .pipe(gulp.dest(OUT.SCRIPTS))
     .pipe(notify({
       message: 'Scripts task complete'
     }));
 });
 
+
 gulp.task('react', function() {
   return gulp.src(IN.JSX + '/**/*.jsx')
     .pipe(plumber())
     .pipe(react())
     .pipe(plumber.stop())
+    .pipe(gulpif(isProduction(), uglify()))
     .pipe(gulp.dest(OUT.JSX))
     .pipe(notify({ message: 'React task complete' }));
 });
 
 gulp.task('images', function() {
   return gulp.src(IN.IMAGES + '/**/*')
-    // .pipe(cache(imagemin({ optimizationLevel: 3, progressive: true, interlaced: true })))
+    .pipe(gulpif(isProduction(), cache(imagemin({ optimizationLevel: 3, progressive: true, interlaced: true }))))
     .pipe(gulp.dest(OUT.IMAGES))
     .pipe(notify({ message: 'Images task complete' }));
 });
@@ -129,13 +137,27 @@ gulp.task('watch', function() {
   gulp.watch(IN.FONTS + '/**/*', ['fonts']);
 
   // Create LiveReload server
+  // livereload
   livereload.listen();
 
   gulp.watch([IN_BASE + '/**']).on('change', livereload.changed);
 });
 
 
+// ########################################
+// Default
+// ########################################
 gulp.task('default', ['clean'], function() {
-  gulp.start('styles', 'scripts', 'images', 'fonts', 'browserify_scripts', 'react', 'watch');
-  // gulp.start();
+  gulp.start('styles', 'scripts', 'images', 'fonts', 'browserify_scripts', 'react');
+
+  if(!isProduction)
+    gulp.start('watch');
+});
+
+// ########################################
+// Build
+// ########################################
+gulp.task('build', function() {
+  env = 'production';
+  gulp.start('default');
 });
