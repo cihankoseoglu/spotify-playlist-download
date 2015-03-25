@@ -13,5 +13,12 @@ Created with the main reason to see whether i can code it or not while trying ou
 ## Author
 Created by [Renārs Vilnis](https://twitter.com/RenarsVilnis)
 
+## Building app
+```bash
+bower install
+npm install
+gulp build
+```
+
 ## License
 License under MIT
