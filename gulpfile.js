@@ -1,3 +1,9 @@
+// Guide
+// http://markgoodyear.com/2014/01/getting-started-with-gulp/
+
+// ########################################
+// Modules
+// ########################################
 var gulp     = require('gulp'),
     sass         = require('gulp-ruby-sass'),
     autoprefixer = require('gulp-autoprefixer'),
@@ -17,13 +23,12 @@ var gulp     = require('gulp'),
     gulpif       = require('gulp-if'),
     gStreamify   = require('gulp-streamify');
 
+
+
+// ########################################
+// Enviroment variable
+// ########################################
 var env = process.env.NODE_ENV || 'development';
-
-// http://markgoodyear.com/2014/01/getting-started-with-gulp/
-
-var isProduction = function() {
-  return env == 'production';
-};
 
 var IN_BASE = 'src';
 var OUT_BASE = 'dist';
@@ -45,6 +50,21 @@ var OUT = {
   FONTS: OUT_BASE + '/fonts',
   JSX: OUT_BASE + '/jsx',
 };
+
+
+
+// ########################################
+// Helpers
+// ########################################
+var isProduction = function() {
+  return env == 'production';
+};
+
+
+
+// ########################################
+// Tasks
+// ########################################
 
 gulp.task('browserify_scripts', function() {
   return gulp.src('lib/main.js')
