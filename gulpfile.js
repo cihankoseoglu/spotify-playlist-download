@@ -170,7 +170,7 @@ gulp.task('watch', function() {
 gulp.task('default', ['clean'], function() {
   gulp.start('styles', 'scripts', 'images', 'fonts', 'browserify_scripts', 'react');
 
-  if(!isProduction)
+  if(!isProduction())
     gulp.start('watch');
 });
 
