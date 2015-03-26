@@ -2,18 +2,33 @@
 
 var config = require('../config/app.js');
 var spotify = require('../lib/spotify.js');
+var async = require('async');
 
 
 
 // ########################################
-// Login
+// App
 // ########################################
 var App = React.createClass({
+
+  getInitialState: function() {
+    return {
+      loggedIn: false
+    };
+  },
+
+  // function that gets called when people logged in our logged out
+  loginChangeHandler: function(state) {
+    this.setState({
+      loggedIn: state
+    });
+  },
+
   render: function() {
     return (
       <div id="app">
-        <AppLogin />
-        <AppBody />
+        {this.state.loggedIn ? null : (<AppLogin loginChange={this.loginChangeHandler} />)}
+        {this.state.loggedIn ? (<AppBody />) : null}
       </div>
     );
   }
@@ -78,9 +93,9 @@ var AppLogin = React.createClass({
         return spotify.api
           .authorizationCodeGrant(code)
           .then(function(data) {
-            console.log('The token expires in ' + data.expires_in);
-            console.log('The access token is ' + data.access_token);
-            console.log('The refresh token is ' + data.refresh_token);
+            console.log('The token expires in ' + data.body.expires_in);
+            console.log('The access token is ' + data.body.access_token);
+            console.log('The refresh token is ' + data.body.refresh_token);
 
             that.setState({
               modalOpened: false
@@ -93,8 +108,18 @@ var AppLogin = React.createClass({
             // https://github.com/marten-de-vries/killable
 
             // Set the access token on the API object to use it in later calls
-            spotify.api.setAccessToken(data.access_token);
-            spotify.api.setRefreshToken(data.refresh_token);
+            spotify.api.setAccessToken(data.body.access_token);
+            spotify.api.setRefreshToken(data.body.refresh_token);
+
+            // Save me data to object
+            spotify.api
+              .getMe()
+              .then(function(data) {
+                spotify.me = data.body;
+                that.props.loginChange(true);
+              }, function(err) {
+                console.error(err);
+              });
 
           }, function(err) {
             // TODO: display error
@@ -119,7 +144,7 @@ var AppLogin = React.createClass({
         <div className="background"></div>
         <div className="body">
           <h1>Music offline</h1>
-          <p>All your music offline</p>
+          <p>All your favorite music offline</p>
           <button onClick={this.onClickHandler}>Login using Spotify</button>
         </div>
       </div>
@@ -133,23 +158,102 @@ var AppLogin = React.createClass({
 // Body
 // ########################################
 var AppBody = React.createClass({
+
+  getInitialState: function() {
+    return {
+      songs: []
+    };
+  },
+
+  handlePlaylistOpen: function(ownerId , playlistId) {
+
+    var that = this;
+
+    console.log('playlist click');
+
+    // TODO: if user has more songs then allowed in single request
+    // Can get amount of songs by playlist.tracks.total
+    spotify.api.getPlaylistTracks(ownerId, playlistId)
+      .then(function(data) {
+        that.setState({
+          songs: data.body.items
+        });
+      }, function(err) {
+        console.error(err);
+      });
+  },
+
   render: function() {
     return (
       <div id="body">
-        <AppBodySidebar />
-        <AppBodyContent />
+        <AppBodyNavigation />
+        <AppBodySidebar openPlaylist={this.handlePlaylistOpen} />
+        <AppBodyContent songs={this.state.songs}/>
       </div>
     );
   }
 });
 
+var AppBodyNavigation = React.createClass({
 
+  render: function () {
+    return (
+      <nav id="navigation">
+        <button>Settings</button>
+        <button>Logout</button>
+      </nav>
+    );
+  }
+});
 
 var AppBodySidebar = React.createClass({
+
+  getInitialState: function() {
+    return {
+      playlists: []
+    };
+  },
+
+  getPlaylists: function() {
+
+    var that = this;
+
+    console.log('Getting playlists');
+
+    spotify.getMePlaylists(function(err, playlists) {
+      if(err)
+        console.error(err);
+
+      console.log('test', playlists);
+      that.setState({
+        playlists: playlists
+      });
+    });
+
+  },
+
+  componentDidMount: function() {
+    this.getPlaylists();
+  },
+
+  handlePlaylistClick: function(el) {
+    this.props.openPlaylist(el.props.id);
+  },
+
   render: function() {
     return (
       <div id="sidebar">
-        List of Playlists goes here!
+        {this.state.playlists.map(function(playlist) {
+          return (
+            <div
+              className="playlist"
+              key={playlist.id}
+              onClick={this.handlePlaylistClick}
+              >
+              {playlist.name}
+            </div>
+          );
+        })}
       </div>
     );
   }
@@ -159,6 +263,16 @@ var AppBodyContent = React.createClass({
   render: function() {
     return (
       <div id="content">
+        {this.props.songs.map(function(song) {
+          return (
+            <div
+              className="song"
+              key={song.track.id}
+              >
+              {song.track.name}
+            </div>
+          );
+        })}
         Playlists info goes here!
       </div>
     );

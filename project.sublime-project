@@ -5,5 +5,16 @@
 			"follow_symlinks": true,
 			"path": "."
 		}
-	]
+	],
+  "settings": {
+    "todoreview": {
+      "exclude_folders": [
+        "*node_modules*",
+        "*bower_components*",
+        "*.git",
+        "*dist*",
+        "*.sass-cache"
+      ]
+    }
+  }
 }

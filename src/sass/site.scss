@@ -110,3 +110,42 @@ a {
     }
   }
 }
+
+
+#body {
+  width: 100%;
+  height: 100%;
+
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  align-content: flex-start;
+  align-items: flex-start;
+}
+
+#navigation {
+  width: 100%;
+  height: 70px;
+}
+
+#sidebar {
+  width: 350px;
+  min-height: calc(100% - 70px);
+
+  .playlist {
+    display: block;
+    width: 100%;
+
+    background-color: #d8d8d8;
+
+    &:hover {
+      cursor: pointer;
+    }
+  }
+}
+
+#content {
+  width: calc(100% - 350px);
+  min-height: calc(100% - 70px);
+}
