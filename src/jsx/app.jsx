@@ -5,7 +5,6 @@ var spotify = require('../lib/spotify.js');
 var async = require('async');
 
 
-
 // ########################################
 // App
 // ########################################
@@ -35,10 +34,9 @@ var App = React.createClass({
 });
 
 
-
-// ########################################
+// ##############################
 // Login
-// ########################################
+// ##############################
 var AppLogin = React.createClass({
 
   getInitialState: function() {
@@ -111,21 +109,21 @@ var AppLogin = React.createClass({
             spotify.api.setAccessToken(data.body.access_token);
             spotify.api.setRefreshToken(data.body.refresh_token);
 
-            // Save me data to object
-            spotify.api
-              .getMe()
-              .then(function(data) {
-                spotify.me = data.body;
-                that.props.loginChange(true);
-              }, function(err) {
+            spotify.getMe(function(err, data) {
+              // TODO: dispaly error
+              if(err)
                 console.error(err);
-              });
+
+              that.props.loginChange(true);
+            });
 
           }, function(err) {
             // TODO: display error
+            console.error(err);
           });
       } else {
         // TODO: display error
+        console.error('Response with no code');
       }
 
     }).listen(config.server.port, function() {
@@ -153,10 +151,9 @@ var AppLogin = React.createClass({
 });
 
 
-
-// ########################################
+// ##############################
 // Body
-// ########################################
+// ##############################
 var AppBody = React.createClass({
 
   getInitialState: function() {
@@ -186,15 +183,19 @@ var AppBody = React.createClass({
   render: function() {
     return (
       <div id="body">
-        <AppBodyNavigation />
-        <AppBodySidebar openPlaylist={this.handlePlaylistOpen} />
+        <AppNavigation />
+        <AppSidebar openPlaylist={this.handlePlaylistOpen} />
         <AppBodyContent songs={this.state.songs}/>
       </div>
     );
   }
 });
 
-var AppBodyNavigation = React.createClass({
+
+// ####################
+// Navigation
+// ####################
+var AppNavigation = React.createClass({
 
   render: function () {
     return (
@@ -206,11 +207,15 @@ var AppBodyNavigation = React.createClass({
   }
 });
 
-var AppBodySidebar = React.createClass({
+
+// ####################
+// Sidebar
+// ####################
+var AppSidebar = React.createClass({
 
   getInitialState: function() {
     return {
-      playlists: []
+      children: []
     };
   },
 
@@ -218,15 +223,12 @@ var AppBodySidebar = React.createClass({
 
     var that = this;
 
-    console.log('Getting playlists');
-
     spotify.getMePlaylists(function(err, playlists) {
       if(err)
         console.error(err);
 
-      console.log('test', playlists);
       that.setState({
-        playlists: playlists
+        children: playlists
       });
     });
 
@@ -236,29 +238,61 @@ var AppBodySidebar = React.createClass({
     this.getPlaylists();
   },
 
-  handlePlaylistClick: function(el) {
-    this.props.openPlaylist(el.props.id);
+  elementClickHandler: function(id) {
+    console.log('AppSidebar::elementClickHandler', id);
+    this.props.openPlaylist(id);
   },
 
   render: function() {
+
+    // var playlists = this.state.children.map(function(playlist, i) {
+    //   console.log(2, playlist.id, playlist.name);
+    //   // return <div>i</div>;
+    //   // return <AppSidebarElement key={playlist.id} {...playlist} onElementClick={this.elementClickHandler} />;
+    //   return <AppSidebarElement key={playlist.id} name={playlist.name}/>;
+    // });
+
+    // console.log(2, playlist, playlist.id, playlist.name, typeof playlist, playlist.constructor.name);
+
+    var children = this.state.children;
+    console.log(children);
+
+    // onElementClick={this.elementClickHandler}
+
     return (
       <div id="sidebar">
-        {this.state.playlists.map(function(playlist) {
-          return (
-            <div
-              className="playlist"
-              key={playlist.id}
-              onClick={this.handlePlaylistClick}
-              >
-              {playlist.name}
-            </div>
-          );
+        {children.map(function(playlist) {
+          return <AppSidebarElement key={playlist.id} name={playlist.name}/>;
         })}
       </div>
     );
   }
 });
 
+var AppSidebarElement = React.createClass({
+
+  clickHandler: function(ev) {
+    ev.stopPropagation();
+    console.log('AppSidebarElement::clickHandler', this.props.id);
+    this.props.onElementClick(this.props.id);
+
+    // onClick={this.clickHandler}
+  },
+
+  render: function() {
+    console.log("sidebar el");
+    return (
+      <div className="playlist" >
+        {this.props.name}
+      </div>
+    );
+  }
+});
+
+
+// ####################
+// Body content
+// ####################
 var AppBodyContent = React.createClass({
   render: function() {
     return (

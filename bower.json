@@ -1,4 +1,5 @@
 {
+  "name": "playlist downloader",
   "private": true,
   "devDependencies": {
     "react": "~0.13.1"
