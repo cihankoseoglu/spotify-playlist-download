@@ -1,9 +1,15 @@
 'use strict';
 
-var config = require('../config/app.js');
-var spotify = require('../lib/spotify.js');
-var async = require('async');
+// Modules
+var http = require('http');
+var killable = require('killable');
 
+// Config
+var config = require('../config/app.js');
+
+// Libs
+var Spotify = require('../lib/spotify.js');
+var spotify;
 
 // ########################################
 // App
@@ -17,17 +23,28 @@ var App = React.createClass({
   },
 
   // function that gets called when people logged in our logged out
-  loginChangeHandler: function(state) {
+  loginChangeHandler: function(status) {
+    console.log('App::loginChangeHandler', status);
+
     this.setState({
-      loggedIn: state
+      loggedIn: status === 'LOGGED_IN'
     });
+  },
+
+  componentDidMount: function() {
+    var that = this;
+
+    spotify = new Spotify(function(err) {
+      if(!err)
+        that.loginChangeHandler('LOGGED_IN');
+    });
+
   },
 
   render: function() {
     return (
       <div id="app">
-        {this.state.loggedIn ? null : (<AppLogin loginChange={this.loginChangeHandler} />)}
-        {this.state.loggedIn ? (<AppBody />) : null}
+        {this.state.loggedIn ? (<AppBody/>) : (<AppLogin loginChange={this.loginChangeHandler}/>)}
       </div>
     );
   }
@@ -45,11 +62,10 @@ var AppLogin = React.createClass({
     }
   },
 
-  onClickHandler: function() {
-
+  clickHandler: function() {
     var that = this;
 
-    // Prevent addition modals from opening
+    // prevent addition modals from opening
     if(this.state.modalOpened)
       return;
 
@@ -58,9 +74,8 @@ var AppLogin = React.createClass({
     });
 
     // modal window
-    var win;
-
-    var width = 960,
+    var modal,
+        width = 960,
         height = 620;
 
     var winOpts = {
@@ -75,75 +90,60 @@ var AppLogin = React.createClass({
       max_height: height
     };
 
-    // Create web server that listens to spotify api response
-    var server = require('http').createServer(function(req, res) {
+    // Create a killable web server that listens to spotify api callback uri
+    // Didn't find any other way of using oauth currently was nw.js doesn't support cross-platform app protocol
+    // similar what skype linkes use or spotify native app login, which makes the user expierence better
+    var server = http.createServer(function(req, res) {
 
+      // make plain response
       res.writeHead(200, {'Content-Type': 'text/plain'});
-      res.end('Herro', function() {
-        win.close();
+      res.end('╰། ͒ ▃ ͒ །╯ - don\'t worry if you see this', function() {
+        // close modal
+        modal.close();
+
+        that.setState({
+          modalOpened: false
+        });
       });
 
       // parse request url and get code
       var uri = require('url').parse(req.url, true);
       var code = uri.query.code;
 
-      if(code) {
-        return spotify.api
-          .authorizationCodeGrant(code)
-          .then(function(data) {
-            console.log('The token expires in ' + data.body.expires_in);
-            console.log('The access token is ' + data.body.access_token);
-            console.log('The refresh token is ' + data.body.refresh_token);
+      server.kill(function() {
+        console.log('http::server', 'killed');
 
-            that.setState({
-              modalOpened: false
-            });
+        spotify.authorizationCodeGrant(code, function(err) {
 
-            // TODO: save data variable to session
-            // https://github.com/nwjs/nw.js/wiki/Save-persistent-data-in-app
-
-            // TODO: close server
-            // https://github.com/marten-de-vries/killable
-
-            // Set the access token on the API object to use it in later calls
-            spotify.api.setAccessToken(data.body.access_token);
-            spotify.api.setRefreshToken(data.body.refresh_token);
-
-            spotify.getMe(function(err, data) {
-              // TODO: dispaly error
-              if(err)
-                console.error(err);
-
-              that.props.loginChange(true);
-            });
-
-          }, function(err) {
-            // TODO: display error
+          if(err) {
             console.error(err);
-          });
-      } else {
-        // TODO: display error
-        console.error('Response with no code');
-      }
+          } else {
+            // change status to logged in
+            that.props.loginChange('LOGGED_IN');
+          }
+
+        });
+      });
 
     }).listen(config.server.port, function() {
-      // open new iframe with oauth with spotify oauth login
-      win = gui.Window.open(spotify.createAuthorizeURL(), winOpts);
+
+      // create a killable server
+      killable(server);
+
+      // open new window with spotify oauth login
+      modal = gui.Window.open(Spotify.createAuthorizeURL(), winOpts);
     });
 
   },
 
   render: function() {
-
-    // TODO: check if logged in then redirect
-
     return (
       <div id="login">
         <div className="background"></div>
         <div className="body">
           <h1>Music offline</h1>
           <p>All your favorite music offline</p>
-          <button onClick={this.onClickHandler}>Login using Spotify</button>
+          <button onClick={this.clickHandler}>Login using Spotify</button>
         </div>
       </div>
     )
@@ -158,12 +158,30 @@ var AppBody = React.createClass({
 
   getInitialState: function() {
     return {
-      songs: []
+      playlists: [],
+      playlist_songs: []
     };
   },
 
-  handlePlaylistOpen: function(ownerId , playlistId) {
+  // getPlaylists: function() {
+  //   var that = this;
 
+  //   spotify.getMePlaylists(function(err, playlists) {
+  //     if(err)
+  //       console.error(err);
+
+  //     that.setState({
+  //       playlists: playlists
+  //     });
+  //   });
+
+  // },
+
+  componentDidMount: function() {
+    // this.getPlaylists();
+  },
+
+  handlePlaylistOpen: function(ownerId , playlistId) {
     var that = this;
 
     console.log('playlist click');
@@ -184,8 +202,10 @@ var AppBody = React.createClass({
     return (
       <div id="body">
         <AppNavigation />
-        <AppSidebar openPlaylist={this.handlePlaylistOpen} />
-        <AppBodyContent songs={this.state.songs}/>
+        <AppSidebar
+          openPlaylist={this.handlePlaylistOpen}
+          playlists={this.state.playlists} />
+        <AppBodyContent songs={this.state.playlist_songs}/>
       </div>
     );
   }
@@ -196,7 +216,6 @@ var AppBody = React.createClass({
 // Navigation
 // ####################
 var AppNavigation = React.createClass({
-
   render: function () {
     return (
       <nav id="navigation">
@@ -213,77 +232,26 @@ var AppNavigation = React.createClass({
 // ####################
 var AppSidebar = React.createClass({
 
-  getInitialState: function() {
-    return {
-      children: []
-    };
-  },
-
-  getPlaylists: function() {
-
-    var that = this;
-
-    spotify.getMePlaylists(function(err, playlists) {
-      if(err)
-        console.error(err);
-
-      that.setState({
-        children: playlists
-      });
-    });
-
-  },
-
-  componentDidMount: function() {
-    this.getPlaylists();
-  },
-
-  elementClickHandler: function(id) {
-    console.log('AppSidebar::elementClickHandler', id);
-    this.props.openPlaylist(id);
+  clickHandler: function(ev) {
+    console.log('AppSidebar::clickHandler', ev.el.id);
+    // this.props.openPlaylist(id);
   },
 
   render: function() {
-
-    // var playlists = this.state.children.map(function(playlist, i) {
-    //   console.log(2, playlist.id, playlist.name);
-    //   // return <div>i</div>;
-    //   // return <AppSidebarElement key={playlist.id} {...playlist} onElementClick={this.elementClickHandler} />;
-    //   return <AppSidebarElement key={playlist.id} name={playlist.name}/>;
-    // });
-
-    // console.log(2, playlist, playlist.id, playlist.name, typeof playlist, playlist.constructor.name);
-
-    var children = this.state.children;
-    console.log(children);
-
-    // onElementClick={this.elementClickHandler}
+    var that = this;
+    var playlists = this.props.playlists;
 
     return (
       <div id="sidebar">
-        {children.map(function(playlist) {
-          return <AppSidebarElement key={playlist.id} name={playlist.name}/>;
+        {playlists.map(function(playlist) {
+          return <div
+            className="playlist"
+            key={playlist.id}
+            onClick={that.clickHandler}
+            >
+              {playlist.name}
+            </div>;
         })}
-      </div>
-    );
-  }
-});
-
-var AppSidebarElement = React.createClass({
-
-  clickHandler: function(ev) {
-    ev.stopPropagation();
-    console.log('AppSidebarElement::clickHandler', this.props.id);
-    this.props.onElementClick(this.props.id);
-
-    // onClick={this.clickHandler}
-  },
-
-  render: function() {
-    console.log("sidebar el");
-    return (
-      <div className="playlist" >
-        {this.props.name}
       </div>
     );
   }
@@ -312,9 +280,6 @@ var AppBodyContent = React.createClass({
     );
   }
 });
-
-
-
 
 
 // ########################################
