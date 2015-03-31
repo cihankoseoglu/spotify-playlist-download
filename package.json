@@ -18,9 +18,11 @@
   },
   "dependencies": {
     "async": "^0.9.0",
+    "flux": "^2.0.1",
     "jsop": "^0.3.0",
     "kickass-search": "0.0.8",
     "killable": "^1.0.0",
+    "object-assign": "^2.0.0",
     "spotify-web-api-node": "^2.0.1",
     "torrent-stream": "^0.18.0"
   },
