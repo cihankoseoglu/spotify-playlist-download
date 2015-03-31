@@ -1,6 +1,7 @@
 'use strict';
 
 // Modules
+var async = require('async');
 var http = require('http');
 var killable = require('killable');
 
@@ -8,7 +9,7 @@ var killable = require('killable');
 var config = require('../config/app.js');
 
 // Libs
-var Spotify = require('../lib/spotify.js');
+// var Spotify = require('../lib/spotify.js');
 var spotify;
 
 // ########################################
@@ -35,8 +36,10 @@ var App = React.createClass({
     var that = this;
 
     spotify = new Spotify(function(err) {
-      if(!err)
+      // if user is logged in
+      if(!err) {
         that.loginChangeHandler('LOGGED_IN');
+      }
     });
 
   },
@@ -110,19 +113,39 @@ var AppLogin = React.createClass({
       var uri = require('url').parse(req.url, true);
       var code = uri.query.code;
 
-      server.kill(function() {
-        console.log('http::server', 'killed');
+      async.series([
 
-        spotify.authorizationCodeGrant(code, function(err) {
+        // kill server
+        function(callback) {
+          server.kill(function() {
+            console.log('http::server', 'killed');
+            callback(null);
+          });
+        },
 
-          if(err) {
-            console.error(err);
-          } else {
-            // change status to logged in
-            that.props.loginChange('LOGGED_IN');
-          }
+        // get authorization code
+        function(callback) {
+          spotify.authorizationCodeGrant(code, function(err) {
+            callback(err);
+          });
+        },
 
-        });
+        // load user data
+        function(callback) {
+          spotify.loadUserData(function(err) {
+            callback(err);
+          });
+        }
+
+      // end callback
+      ], function(err) {
+        if(err) {
+          console.error(err);
+          return;
+        }
+
+        // change status to logged in
+        that.props.loginChange('LOGGED_IN');
       });
 
     }).listen(config.server.port, function() {
@@ -163,22 +186,14 @@ var AppBody = React.createClass({
     };
   },
 
-  // getPlaylists: function() {
-  //   var that = this;
-
-  //   spotify.getMePlaylists(function(err, playlists) {
-  //     if(err)
-  //       console.error(err);
-
-  //     that.setState({
-  //       playlists: playlists
-  //     });
-  //   });
-
-  // },
+  getPlaylists: function() {
+    this.setState({
+      playlists: spotify.playlists
+    });
+  },
 
   componentDidMount: function() {
-    // this.getPlaylists();
+    this.getPlaylists();
   },
 
   handlePlaylistOpen: function(ownerId , playlistId) {
@@ -233,7 +248,8 @@ var AppNavigation = React.createClass({
 var AppSidebar = React.createClass({
 
   clickHandler: function(ev) {
-    console.log('AppSidebar::clickHandler', ev.el.id);
+    ev.stopPropagation();
+    console.log('AppSidebar::clickHandler', ev.target.key);
     // this.props.openPlaylist(id);
   },
 
