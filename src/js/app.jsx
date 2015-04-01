@@ -6,7 +6,7 @@ var http = require('http');
 var killable = require('killable');
 
 // Config
-var config = require('../config/app.js');
+var config = require('../../config/app.js');
 
 // Libs
 // var Spotify = require('../lib/spotify.js');

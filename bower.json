@@ -1,7 +1,21 @@
 {
-  "name": "playlist downloader",
-  "private": true,
-  "devDependencies": {
-    "react": "~0.13.1"
+  "name": "spotify-playlist-download",
+  "version": "0.0.0",
+  "homepage": "https://github.com/renarsvilnis/spotify-playlist-download",
+  "authors": [
+    "renars.vilnis <renars.vilnis@warp.lv>"
+  ],
+  "license": "MIT",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "font-awesome": "~4.3.0",
+    "react": "~0.13.1",
+    "ckeditor": "~4.4.7"
   }
 }

@@ -4,12 +4,29 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>Spotify playlist downloader</title>
+
+  <!-- build:css css/vendor.css -->
+  <!-- bower:css -->
+  <!-- endbower -->
+  <!-- endbuild -->
+
   <link href='http://fonts.googleapis.com/css?family=Montserrat:400,700' rel='stylesheet' type='text/css'>
-  <link rel="stylesheet", href="../dist/stylesheets/site.css">
+
+  <!-- build:css css/site.css -->
+  <link rel="stylesheet", href="../css/site.css">
+  <!-- endbuild -->
+
 </head>
 <body>
 
+  <!-- build:js js/vendor.js -->
+  <!-- bower:js -->
+  <!-- endbower -->
+  <!-- endbuild -->
 
+  <!-- <script src="/bower_components/react/react-with-addons.js"></script> -->
+
+  <!-- build:js js/site.js -->
   <script>
     var gui = require('nw.gui');
     var win = gui.Window.get();
@@ -26,12 +43,8 @@
     // open dev tools
     win.showDevTools();
   </script>
-  <script src="../bower_components/react/react.js"></script>
   <script src="../lib/spotify.js"></script>
   <script src="../dist/jsx/app.js"></script>
-  <script>
-
-  </script>
-
+  <!-- endbuild -->
 </body>
 </html>

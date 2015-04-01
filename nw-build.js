@@ -1,3 +1,5 @@
+'use strict';
+
 // https://github.com/mllrsohn/node-webkit-builder
 var NwBuilder = require('node-webkit-builder');
 
@@ -10,7 +12,7 @@ prodDepenencies.map(function(el, i) {
   prodDepenencies[i] = './node_modules/' + el + '/**/**';
 });
 
-buildFiles = [
+var buildFiles = [
   './package.json',
   './lib/**/**',
   './dist/**/**',
@@ -31,7 +33,6 @@ nw.on('log', console.log);
 nw.build()
   .then(function() {
     console.log('all done!');
-  })
-  .catch(function(error) {
+  }, function(error) {
     console.error(error);
   });
