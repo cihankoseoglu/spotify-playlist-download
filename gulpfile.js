@@ -9,6 +9,7 @@
 // [ ] check production build
 // [ ] add nodewebkit compile custom
 // [ ] add testing support
+// [ ] Live reload
 
 // ########################################
 // Modules
@@ -30,7 +31,7 @@ var gulp = require('gulp');
 var $ = require('gulp-load-plugins')({
   scope: ['devDependencies'],
   camelize: true,
-  lazy: true,
+  lazy: false,
 });
 
 // ########################################
@@ -38,7 +39,7 @@ var $ = require('gulp-load-plugins')({
 // ########################################
 
 var ENV = {
-  DEV: 1,
+  DEV : 1,
   PROD: 2
 };
 
@@ -49,20 +50,20 @@ var IN_BASE = 'src/';
 var OUT_BASE = 'dist/';
 var BOWER = 'bower_components/';
 
-var IN = {
-  CSS: IN_BASE + 'scss/',
-  JS: IN_BASE + 'js/',
-  IMG: IN_BASE + 'img/',
-  FONTS: IN_BASE + 'fonts/',
-  HTML: IN_BASE + 'html/',
+var IN  = {
+  CSS   : IN_BASE + 'scss/',
+  JS    : IN_BASE + 'js/',
+  IMG   : IN_BASE + 'img/',
+  FONTS : IN_BASE + 'fonts/',
+  HTML  : IN_BASE + 'html/',
 };
 
 var OUT = {
-  CSS: OUT_BASE + 'css/',
-  JS: OUT_BASE + 'js/',
-  IMG: OUT_BASE + 'img/',
-  FONTS: OUT_BASE + 'fonts/',
-  HTML: OUT_BASE
+  CSS   : OUT_BASE + 'css/',
+  JS    : OUT_BASE + 'js/',
+  IMG   : OUT_BASE + 'img/',
+  FONTS : OUT_BASE + 'fonts/',
+  HTML  : OUT_BASE
 };
 
 
@@ -114,7 +115,10 @@ gulp.task('styles', function() {
     }))
     .pipe($.postcss(processors))
     .pipe($.
-      if (isProduction(), $.csso()))
+      if (isProduction(), $.minifyCss({
+      keepSpecialComments: 0,
+      processImport: true,
+    })))
     .pipe($.sourcemaps.write('.'))
     .pipe(gulp.dest(OUT.CSS));
 });
@@ -232,13 +236,29 @@ gulp.task('jshint', function() {
 // HTML
 // ####################
 gulp.task('html', function() {
+
+  var assets = $.useref.assets({
+    searchPath: [
+     'dist',
+     '.'
+    ]
+  });
+
   return gulp.src(IN.HTML + '*.html')
-  // inject bower depencies
-  .pipe(wiredep({
-    ignorePath: /^(\.\.\/)*\.\./,
-  }))
-  // minify html
-  .pipe($.if (isProduction(),
+    // inject bower depencies
+    .pipe(wiredep({
+      ignorePath: /^(\.\.\/)*\.\./,
+    }))
+    // .pipe(assets)
+    // .pipe($.if('*.js', $.uglify()))
+    // .pipe($.if('*.css', $.minifyCss({
+    //   keepSpecialComments: 0,
+    //   processImport: true,
+    // })))
+    // .pipe(assets.restore())
+    // .pipe($.useref())
+    // minify html
+    .pipe($.if (isProduction(),
       $.minifyHtml({
         conditionals: false, // no need for IE specific tags
         loose: true
