@@ -1,3 +1,4 @@
+/** @jsx React.DOM */
 'use strict';
 
 // Modules
@@ -16,6 +17,10 @@ var spotify;
 // App
 // ########################################
 var App = React.createClass({
+
+  propTypes: {
+    test: React.PropTypes.number
+  },
 
   getInitialState: function() {
     return {
@@ -46,7 +51,7 @@ var App = React.createClass({
 
   render: function() {
     return (
-      <div id="app">
+      <div id='app'>
         {this.state.loggedIn ? (<AppBody/>) : (<AppLogin loginChange={this.loginChangeHandler}/>)}
       </div>
     );
@@ -62,7 +67,7 @@ var AppLogin = React.createClass({
   getInitialState: function() {
     return {
       modalOpened: false
-    }
+    };
   },
 
   clickHandler: function() {

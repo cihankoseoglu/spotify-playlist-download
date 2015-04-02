@@ -14,8 +14,6 @@
     "tests"
   ],
   "dependencies": {
-    "font-awesome": "~4.3.0",
-    "react": "~0.13.1",
-    "ckeditor": "~4.4.7"
+    "react": "~0.13.1"
   }
 }
