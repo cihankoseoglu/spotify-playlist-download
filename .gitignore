@@ -120,3 +120,12 @@ bower_components
 .bower-cache
 .bower-registry
 .bower-tmp
+
+
+### NW.js ###
+cache/
+build/
+
+
+### Custom ###
+storage/
